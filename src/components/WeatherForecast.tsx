@@ -1,34 +1,37 @@
 "use client"
 
+import React from "react"
 import { useState, useEffect } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Sun, Cloud, CloudRain, CloudDrizzle, CloudLightning, Loader2 } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 
 // Weather icon mapping function based on Visual Crossing icon codes
-const getWeatherIcon = (condition) => {
-  const iconMap = {
-    "clear-day": <Sun className="h-8 w-8 text-yellow-500" />,
-    "clear-night": <Sun className="h-8 w-8 text-yellow-500" />,
-    "partly-cloudy-day": <Cloud className="h-8 w-8 text-gray-400" />,
-    "partly-cloudy-night": <Cloud className="h-8 w-8 text-gray-400" />,
-    "cloudy": <Cloud className="h-8 w-8 text-gray-500" />,
-    "rain": <CloudRain className="h-8 w-8 text-blue-500" />,
-    "showers-day": <CloudDrizzle className="h-8 w-8 text-blue-400" />,
-    "showers-night": <CloudDrizzle className="h-8 w-8 text-blue-400" />,
-    "fog": <Cloud className="h-8 w-8 text-gray-300" />,
-    "wind": <Cloud className="h-8 w-8 text-gray-400" />,
-    "snow": <CloudRain className="h-8 w-8 text-blue-200" />,
-    "thunder-rain": <CloudLightning className="h-8 w-8 text-purple-500" />,
-    "thunder-showers-day": <CloudLightning className="h-8 w-8 text-purple-500" />,
-    "thunder-showers-night": <CloudLightning className="h-8 w-8 text-purple-500" />,
-  }
+const iconMap = {
+  "clear-day": <Sun className="h-8 w-8 text-yellow-500" />,
+  "clear-night": <Sun className="h-8 w-8 text-yellow-500" />,
+  "partly-cloudy-day": <Cloud className="h-8 w-8 text-gray-400" />,
+  "partly-cloudy-night": <Cloud className="h-8 w-8 text-gray-400" />,
+  "cloudy": <Cloud className="h-8 w-8 text-gray-500" />,
+  "rain": <CloudRain className="h-8 w-8 text-blue-500" />,
+  "showers-day": <CloudDrizzle className="h-8 w-8 text-blue-400" />,
+  "showers-night": <CloudDrizzle className="h-8 w-8 text-blue-400" />,
+  "fog": <Cloud className="h-8 w-8 text-gray-300" />,
+  "wind": <Cloud className="h-8 w-8 text-gray-400" />,
+  "snow": <CloudRain className="h-8 w-8 text-blue-200" />,
+  "thunder-rain": <CloudLightning className="h-8 w-8 text-purple-500" />,
+  "thunder-showers-day": <CloudLightning className="h-8 w-8 text-purple-500" />,
+  "thunder-showers-night": <CloudLightning className="h-8 w-8 text-purple-500" />,
+} as const;
 
-  return iconMap[condition] || <Cloud className="h-8 w-8 text-gray-400" />
+type IconKey = keyof typeof iconMap;
+
+const getWeatherIcon = (condition: string) => {
+  return iconMap[condition as IconKey] || <Cloud className="h-8 w-8 text-gray-400" />;
 }
 
 // Get day name from date
-const getDayName = (dateStr) => {
+const getDayName = (dateStr:any) => {
   const date = new Date(dateStr)
   const today = new Date()
 
@@ -48,7 +51,7 @@ const getDayName = (dateStr) => {
 }
 
 // Format date as "May 5" in Bengali
-const formatDate = (dateStr) => {
+const formatDate = (dateStr:any) => {
   const date = new Date(dateStr)
   
   // Bengali month names
@@ -63,7 +66,7 @@ const formatDate = (dateStr) => {
 }
 
 // Determine crop impact based on weather conditions
-const getCropImpact = (weather) => {
+const getCropImpact = (weather:any) => {
   // Rain chance
   const rainChance = weather.precipprob || 0
 
@@ -109,7 +112,7 @@ const getCropImpact = (weather) => {
 }
 
 // Calculate sunshine hours based on weather condition
-const getSunshineHours = (weather) => {
+const getSunshineHours = (weather:any) => {
   const conditionCode = weather.icon
   const cloudCover = weather.cloudcover || 0
 
@@ -130,7 +133,7 @@ const getSunshineHours = (weather) => {
   return Math.round(10 * (1 - cloudCover / 100))
 }
 
-export default function WeatherForecast({ forecast }) {
+export default function WeatherForecast({ forecast }:{ forecast: any }) {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState(null)
   
@@ -145,7 +148,35 @@ export default function WeatherForecast({ forecast }) {
   }
   
   // Process the data to match our format
-  const forecastData = forecast?.days.slice(0, 15).map(day => {
+  interface ForecastDay {
+    datetime: string;
+    icon: string;
+    conditions: string;
+    tempmax: number;
+    tempmin: number;
+    precipprob?: number;
+    humidity: number;
+    windspeed: number;
+    cloudcover?: number;
+    temp: number;
+  }
+
+  interface ForecastDataItem {
+    day: string;
+    date: string;
+    icon: React.ReactElement;
+    condition: string;
+    highTemp: number;
+    lowTemp: number;
+    rainChance: number;
+    humidity: number;
+    sunshineHours: number;
+    windSpeed: number;
+    cropImpact: string;
+    cropImpactColor: string;
+  }
+
+  const forecastData: ForecastDataItem[] = forecast?.days.slice(0, 15).map((day: ForecastDay): ForecastDataItem => {
     const sunshineHours = getSunshineHours(day)
     const cropImpactInfo = getCropImpact(day)
 

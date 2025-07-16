@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { Droplets, Thermometer, Sun, CloudRain, MapPin, Loader2 } from 'lucide-react'
 
 
-export default function DynamicWeatherSection({ weatherData }) {
+export default function DynamicWeatherSection({ weatherData }: { weatherData: any }) {
   const [isLoading, setIsLoading] = useState(false)
 
   // If no weather data is available yet
@@ -39,7 +39,7 @@ export default function DynamicWeatherSection({ weatherData }) {
   const current = weatherData.currentConditions;
   
   // Get background image based on weather condition
-  const getBackgroundImage = (condition) => {
+  const getBackgroundImage = (condition:any) => {
     if (condition.includes("clear")) {
       return "url('/placeholder.svg?height=400&width=800')"
     } else if (condition.includes("cloud") || condition.includes("partly")) {
